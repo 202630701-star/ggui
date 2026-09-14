@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장르별 노래 추천 - Music Recommendation</title>
+    <style>
+        /* 기본 리셋 및 스타일 설정 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* 헤더 */
+        header {
+            background-color: #1f1f1f;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1db954; /* 스포티파이 느낌의 스피어민트 그린 */
+            text-decoration: none;
+        }
+
+        /* 히어로 섹션 */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(180deg, #1f1f1f 0%, #121212 100%);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #b3b3b3;
+            font-size: 1.1rem;
+        }
+
+        /* 메인 컨텐츠 영역 */
+        container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+            display: block;
+        }
+
+        /* 장르 필터 버튼 */
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background-color: #282828;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: #1db954;
+            color: #000;
+        }
+
+        /* 노래 카드가 들어가는 그리드 */
+        .song-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+
+        /* 노래 카드 디자인 */
+        .song-card {
+            background-color: #181818;
+            border-radius: 12px;
+            padding: 16px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .song-card:hover {
+            background-color: #282828;
+            transform: translateY(-5px);
+        }
+
+        .album-art {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        .song-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-artist {
+            color: #b3b3b3;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .song-tag {
+            align-self: flex-start;
+            background-color: #333;
+            color: #1db954;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        /* 푸터 */
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #000;
+            color: #777;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 헤더 -->
+    <header>
+        <a href="#" class="logo">🎵 MusicList</a>
+    </header>
+
+    <!-- 히어로 섹션 -->
+    <section class="hero">
+        <h1>오늘 어떤 기분이신가요?</h1>
+        <p>좋아하는 장르를 선택하고 추천 곡을 확인해 보세요.</p>
+    </section>
+
+    <!-- 메인 콘텐츠 -->
+    <container>
+        <!-- 장르 선택 카테고리 -->
+        <div class="filter-container">
+            <button class="filter-btn active" onclick="filterGenre('all')">전체</button>
+            <button class="filter-btn" onclick="filterGenre('kpop')">K-POP</button>
+            <button class="filter-btn" onclick="filterGenre('pop')">POP</button>
+            <button class="filter-btn" onclick="filterGenre('ballad')">발라드</button>
+            <button class="filter-btn" onclick="filterGenre('hiphop')">힙합/R&B</button>
+            <button class="filter-btn" onclick="filterGenre('indie')">인디</button>
+        </div>
+
+        <!-- 노래 목록 그리드 -->
+        <div class="song-grid" id="songGrid">
+            
+            <!-- K-POP -->
+            <div class="song-card" data-genre="kpop">
+                <img src="https://picsum.photos/300/300?random=1" alt="커버" class="album-art">
+                <div class="song-title">Supernatural</div>
+                <div class="song-artist">NewJeans</div>
+                <span class="song-tag">K-POP</span>
+            </div>
+
+            <div class="song-card" data-genre="kpop">
+                <img src="https://picsum.photos/300/300?random=2" alt="커버" class="album-art">
+                <div class="song-title">HEYA (해야)</div>
+                <div class="song-artist">IVE (아이브)</div>
+                <span class="song-tag">K-POP</span>
+            </div>
+
+            <!-- POP -->
+            <div class="song-card" data-genre="pop">
+                <img src="https://picsum.photos/300/300?random=3" alt="커버" class="album-art">
+                <div class="song-title">Espresso</div>
+                <div class="song-artist">Sabrina Carpenter</div>
+                <span class="song-tag">POP</span>
+            </div>
+
+            <div class="song-card" data-genre="pop">
+                <img src="https://picsum.photos/300/300?random=4" alt="커버" class="album-art">
+                <div class="song-title">As It Was</div>
+                <div class="song-artist">Harry Styles</div>
+                <span class="song-tag">POP</span>
+            </div>
+
+            <!-- 발라드 -->
+            <div class="song-card" data-genre="ballad">
+                <img src="https://picsum.photos/300/300?random=5" alt="커버" class="album-art">
+                <div class="song-title">너의 모든 순간</div>
+                <div class="song-artist">성시경</div>
+                <span class="song-tag">발라드</span>
+            </div>
+
+            <div class="song-card" data-genre="ballad">
+                <img src="https://picsum.photos/300/300?random=6" alt="커버" class="album-art">
+                <div class="song-title">사건의 지평선</div>
+                <div class="song-artist">윤하 (YOUNHA)</div>
+                <span class="song-tag">발라드</span>
+            </div>
+
+            <!-- 힙합/R&B -->
+            <div class="song-card" data-genre="hiphop">
+                <img src="https://picsum.photos/300/300?random=7" alt="커버" class="album-art">
+                <div class="song-title">Smoke (Prod. Dynamicduo)</div>
+                <div class="song-artist">다이나믹 듀오, 이영지</div>
+                <span class="song-tag">힙합/R&B</span>
+            </div>
+
+            <div class="song-card" data-genre="hiphop">
+                <img src="https://picsum.photos/300/300?random=8" alt="커버" class="album-art">
+                <div class="song-title">METEOR</div>
+                <div class="song-artist">창모 (CHANGMO)</div>
+                <span class="song-tag">힙합/R&B</span>
+            </div>
+
+            <!-- 인디 -->
+            <div class="song-card" data-genre="indie">
+                <img src="https://picsum.photos/300/300?random=9" alt="커버" class="album-art">
+                <div class="song-title">주저하는 연인들을 위해</div>
+                <div class="song-artist">잔나비</div>
+                <span class="song-tag">인디</span>
+            </div>
+
+            <div class="song-card" data-genre="indie">
+                <img src="https://picsum.photos/300/300?random=10" alt="커버" class="album-art">
+                <div class="song-title">EVERYTHING</div>
+                <div class="song-artist">검정치마</div>
+                <span class="song-tag">인디</span>
+            </div>
+
+        </div>
+    </container>
+
+    <!-- 푸터 -->
+    <footer>
+        <p>&copy; 2026 장르별 노래 추천. All rights reserved.</p>
+    </footer>
+
+    <!-- 자바스크립트: 장르 필터링 기능 -->
+    <script>
+        function filterGenre(genre) {
+            // 버튼 활성화 클래스 처리
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 카드 필터링 처리
+            const cards = document.querySelectorAll('.song-card');
+            cards.forEach(card => {
+                if (genre === 'all' || card.getAttribute('data-genre') === genre) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
