@@ -3,287 +3,1449 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>장르별 노래 추천 - Music Recommendation</title>
+    <title>틈영단 (Teum Yeong-dan) - AI 우주선 영어단어 몰입 암기 플랫폼</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cockpit: {
+                            bg: '#f1f5f9',
+                            panel: '#ffffff',
+                            border: '#cbd5e1',
+                            dark: '#0f172a',
+                            accent: '#0284c7',
+                            accentGlow: '#38bdf8',
+                            gold: '#eab308'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
     <style>
-        /* 기본 리셋 및 스타일 설정 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
         body {
-            background-color: #121212;
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.12), transparent 40%),
+                radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 100% 100%, 20px 20px;
+        }
+
+        /* Sci-Fi Cockpit Custom UI Elements */
+        .cockpit-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+        }
+
+        .cockpit-card-dark {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 20px rgba(2, 132, 199, 0.15);
+        }
+
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.35);
+        }
+
+        .neon-glow-btn:hover {
+            box-shadow: 0 0 20px rgba(2, 132, 199, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             color: #ffffff;
-            line-height: 1.6;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+            border-color: #38bdf8;
         }
 
-        /* 헤더 */
-        header {
-            background-color: #1f1f1f;
-            padding: 20px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        /* 3D Flip Card Animation */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1db954; /* 스포티파이 느낌의 스피어민트 그린 */
-            text-decoration: none;
+        /* Pulse Animations */
+        @keyframes radar-sweep {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .radar-line {
+            animation: radar-sweep 4s linear infinite;
+            transform-origin: bottom right;
         }
 
-        /* 히어로 섹션 */
-        .hero {
-            text-align: center;
-            padding: 60px 20px;
-            background: linear-gradient(180deg, #1f1f1f 0%, #121212 100%);
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
-
-        .hero p {
-            color: #b3b3b3;
-            font-size: 1.1rem;
-        }
-
-        /* 메인 컨텐츠 영역 */
-        container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-            display: block;
-        }
-
-        /* 장르 필터 버튼 */
-        .filter-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            background-color: #282828;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn:hover, .filter-btn.active {
-            background-color: #1db954;
-            color: #000;
-        }
-
-        /* 노래 카드가 들어가는 그리드 */
-        .song-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 25px;
-        }
-
-        /* 노래 카드 디자인 */
-        .song-card {
-            background-color: #181818;
-            border-radius: 12px;
-            padding: 16px;
-            transition: transform 0.3s ease, background-color 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .song-card:hover {
-            background-color: #282828;
-            transform: translateY(-5px);
-        }
-
-        .album-art {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 14px;
-        }
-
-        .song-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .song-artist {
-            color: #b3b3b3;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-
-        .song-tag {
-            align-self: flex-start;
-            background-color: #333;
-            color: #1db954;
-            font-size: 0.75rem;
-            padding: 4px 8px;
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
             border-radius: 4px;
-            font-weight: bold;
         }
-
-        /* 푸터 */
-        footer {
-            text-align: center;
-            padding: 30px;
-            background-color: #000;
-            color: #777;
-            font-size: 0.9rem;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen text-slate-800 flex flex-col relative overflow-x-hidden">
 
-    <!-- 헤더 -->
-    <header>
-        <a href="#" class="logo">🎵 MusicList</a>
+    <!-- START ENGINE / AIRLOCK OVERLAY MODAL -->
+    <div id="start-overlay" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+        <div class="max-w-xl w-full cockpit-card-dark rounded-3xl p-8 text-center relative border border-cyan-500/40 shadow-[0_0_50px_rgba(6,182,212,0.25)]">
+            <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-cyan-950/80 border-2 border-cyan-400 flex items-center justify-center relative neon-glow">
+                <i class="fa-solid fa-rocket text-4xl text-cyan-400 animate-pulse"></i>
+                <div class="absolute inset-0 rounded-full border border-cyan-400/30 animate-ping"></div>
+            </div>
+            
+            <div class="inline-block px-3 py-1 bg-cyan-900/60 text-cyan-300 text-xs font-mono font-bold rounded-full mb-3 border border-cyan-500/30">
+                🚀 중·고등학교 기술 수행평가 출품작
+            </div>
+            
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2 tracking-tight">
+                틈영단 <span class="text-cyan-400 font-mono text-2xl">TEUM-YEONGDAN</span>
+            </h1>
+            <p class="text-slate-300 text-sm sm:text-base mb-6 font-medium">
+                AI 교과서 맞춤 단어 생성 + STT 음성인식 퀴즈 + 방해 앱 차단 몰입 시스템
+            </p>
+
+            <div class="bg-slate-900/80 rounded-2xl p-4 text-left text-xs font-mono text-slate-300 space-y-2 mb-8 border border-slate-800">
+                <div class="flex items-center gap-2 text-cyan-400 font-bold border-b border-slate-800 pb-2">
+                    <i class="fa-solid fa-microchip"></i> 핵심 시스템 작동 상태 Check
+                </div>
+                <div class="flex justify-between items-center"><span class="text-slate-400">Gemini AI Engine:</span> <span class="text-emerald-400">READY (v3-flash)</span></div>
+                <div class="flex justify-between items-center"><span class="text-slate-400">Web Speech STT/TTS:</span> <span class="text-emerald-400">ENABLED</span></div>
+                <div class="flex justify-between items-center"><span class="text-slate-400">Warp Focus Monitor:</span> <span class="text-emerald-400">ARMED</span></div>
+            </div>
+
+            <button onclick="startSpaceshipEngine()" class="w-full py-4 bg-gradient-to-r from-cyan-600 via-sky-500 to-blue-600 text-white font-extrabold rounded-2xl shadow-lg neon-glow-btn text-lg flex items-center justify-center gap-3 border border-cyan-300/40">
+                <i class="fa-solid fa-power-off text-xl"></i>
+                <span>[ 🚀 우주선 엔진 시동 및 콕핏 제어반 가동 ]</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- TOP NAVIGATION HEADER BAR -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md text-white border-b border-slate-700 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Logo & Pilot Info -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-sky-400 flex items-center justify-center shadow-md font-extrabold text-lg text-white border border-cyan-300/30">
+                    🚀
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-lg tracking-tight text-white">틈영단</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-900/80 text-cyan-300 font-mono font-semibold border border-cyan-500/30">Cockpit v2.5</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-mono">Pilot: <span id="header-pilot-name" class="text-cyan-400 font-bold">학생 조종사</span> | LV.<span id="header-pilot-level">1</span></p>
+                </div>
+            </div>
+
+            <!-- Top HUD Badges -->
+            <div class="hidden md:flex items-center gap-4 text-xs font-mono">
+                <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-gem text-cyan-400"></i>
+                    <span class="text-slate-400">에너지:</span>
+                    <span id="hud-energy" class="text-cyan-300 font-bold">120</span> <span class="text-cyan-500">💎</span>
+                </div>
+                <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-amber-400"></i>
+                    <span class="text-slate-400">연속 학습:</span>
+                    <span id="hud-streak" class="text-amber-300 font-bold">3일</span>
+                </div>
+                <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-bullseye text-emerald-400"></i>
+                    <span class="text-slate-400">정답률:</span>
+                    <span id="hud-accuracy" class="text-emerald-300 font-bold">92%</span>
+                </div>
+            </div>
+
+            <!-- Header Action Buttons -->
+            <div class="flex items-center gap-2">
+                <button onclick="openEvalReportModal()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5 border border-amber-300/30">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <span>📄 수행평가 보고서</span>
+                </button>
+            </div>
+        </div>
     </header>
 
-    <!-- 히어로 섹션 -->
-    <section class="hero">
-        <h1>오늘 어떤 기분이신가요?</h1>
-        <p>좋아하는 장르를 선택하고 추천 곡을 확인해 보세요.</p>
-    </section>
+    <!-- MAIN WRAPPER CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full flex flex-col gap-6">
 
-    <!-- 메인 콘텐츠 -->
-    <container>
-        <!-- 장르 선택 카테고리 -->
-        <div class="filter-container">
-            <button class="filter-btn active" onclick="filterGenre('all')">전체</button>
-            <button class="filter-btn" onclick="filterGenre('kpop')">K-POP</button>
-            <button class="filter-btn" onclick="filterGenre('pop')">POP</button>
-            <button class="filter-btn" onclick="filterGenre('ballad')">발라드</button>
-            <button class="filter-btn" onclick="filterGenre('hiphop')">힙합/R&B</button>
-            <button class="filter-btn" onclick="filterGenre('indie')">인디</button>
-        </div>
+        <!-- TEACHER IDENTIFICATION & APP CONCEPT BANNER -->
+        <section class="cockpit-card rounded-2xl p-5 border-l-4 border-l-cyan-600 relative overflow-hidden">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2.5 py-0.5 bg-cyan-100 text-cyan-800 text-xs font-bold rounded-md border border-cyan-300">
+                            📢 시스템 가이드
+                        </span>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-800">
+                            기술 수행평가 핵심 가이드 : <span class="text-cyan-700">무엇을 위한 플랫폼인가요?</span>
+                        </h2>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-4xl">
+                        본 플랫폼은 중·고등학생이 **교과서 단원**만 입력하면 **Gemini AI**가 영단어/발음기호/예문을 즉시 생성하고, 
+                        **STT 음성인식 사격 퀴즈**와 **탭 이탈 시 알람이 울리는 방해 앱 차단(Warp 몰입실)**을 결합한 통합 학습 우주선입니다.
+                    </p>
+                </div>
+                
+                <div class="flex items-center gap-2 shrink-0">
+                    <button onclick="switchTab('tab-guide')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow">
+                        <i class="fa-solid fa-circle-info text-cyan-400"></i>
+                        <span>시스템 매뉴얼</span>
+                    </button>
+                </div>
+            </div>
+        </section>
 
-        <!-- 노래 목록 그리드 -->
-        <div class="song-grid" id="songGrid">
+        <!-- HIGH-VISIBILITY METALLIC NAVIGATION TABS -->
+        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+            <button onclick="switchTab('tab-words')" id="btn-tab-words" class="nav-btn active cockpit-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 border border-slate-300 text-slate-700 font-bold hover:border-cyan-400">
+                <span class="text-xs text-slate-400 font-mono">[01 MODULE]</span>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-vial-virus text-base text-cyan-600"></i>
+                    <span class="text-xs sm:text-sm">단어 연구소</span>
+                </div>
+            </button>
+
+            <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="nav-btn cockpit-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 border border-slate-300 text-slate-700 font-bold hover:border-cyan-400">
+                <span class="text-xs text-slate-400 font-mono">[02 MODULE]</span>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-crosshairs text-base text-red-500"></i>
+                    <span class="text-xs sm:text-sm">사격 훈련소</span>
+                </div>
+            </button>
+
+            <button onclick="switchTab('tab-warp')" id="btn-tab-warp" class="nav-btn cockpit-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 border border-slate-300 text-slate-700 font-bold hover:border-cyan-400">
+                <span class="text-xs text-slate-400 font-mono">[03 MODULE]</span>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-base text-indigo-600"></i>
+                    <span class="text-xs sm:text-sm">워프 몰입실</span>
+                </div>
+            </button>
+
+            <button onclick="switchTab('tab-analytics')" id="btn-tab-analytics" class="nav-btn cockpit-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 border border-slate-300 text-slate-700 font-bold hover:border-cyan-400">
+                <span class="text-xs text-slate-400 font-mono">[04 MODULE]</span>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-base text-emerald-600"></i>
+                    <span class="text-xs sm:text-sm">학습 분석</span>
+                </div>
+            </button>
+
+            <button onclick="switchTab('tab-academy')" id="btn-tab-academy" class="nav-btn cockpit-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 border border-slate-300 text-slate-700 font-bold hover:border-cyan-400">
+                <span class="text-xs text-slate-400 font-mono">[05 MODULE]</span>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-base text-amber-500"></i>
+                    <span class="text-xs sm:text-sm">조종사 아카데미</span>
+                </div>
+            </button>
+
+            <button onclick="switchTab('tab-guide')" id="btn-tab-guide" class="nav-btn cockpit-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 border border-slate-300 text-slate-700 font-bold hover:border-cyan-400">
+                <span class="text-xs text-slate-400 font-mono">[06 MODULE]</span>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-book-bookmark text-base text-purple-600"></i>
+                    <span class="text-xs sm:text-sm">시스템 가이드</span>
+                </div>
+            </button>
+        </nav>
+
+        <!-- MODULE 01: AI & CUSTOM WORD LAB -->
+        <section id="tab-words" class="tab-content flex flex-col gap-6">
             
-            <!-- K-POP -->
-            <div class="song-card" data-genre="kpop">
-                <img src="https://picsum.photos/300/300?random=1" alt="커버" class="album-art">
-                <div class="song-title">Supernatural</div>
-                <div class="song-artist">NewJeans</div>
-                <span class="song-tag">K-POP</span>
+            <!-- AI Generator Banner / Input Form -->
+            <div class="cockpit-card rounded-3xl p-6 border border-slate-200">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 border-b border-slate-200 pb-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-xl text-cyan-600"></i>
+                            <h3 class="text-xl font-extrabold text-slate-800">Gemini AI 교과서 단어 연구소</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                            수행평가용 교과서 단원이나 원하는 영어 단원 주제를 입력하면 AI가 맞춤 데이터베이스를 구축합니다.
+                        </p>
+                    </div>
+
+                    <!-- Gemini API Key Modal Trigger / Status -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="openApiKeyModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-300 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-key text-amber-500"></i>
+                            <span id="api-key-status-text">Gemini API Key 설정</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Generation Form -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">교과서 단원 / 주제 입력</label>
+                        <input type="text" id="ai-input-topic" placeholder="예: 중2 YBM 4단원 Environment or 우주 관련 핵심 단어 10개" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">생성 단어 수</label>
+                        <select id="ai-input-count" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm font-medium bg-white">
+                            <option value="5">5개 (스피드 생성)</option>
+                            <option value="8" selected>8개 (추천)</option>
+                            <option value="12">12개 (정밀 학습)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="generateAiWords()" id="btn-generate-ai" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-extrabold text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 neon-glow-btn">
+                            <i class="fa-solid fa-microchip"></i>
+                            <span>AI 단어 생성 가동</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div class="song-card" data-genre="kpop">
-                <img src="https://picsum.photos/300/300?random=2" alt="커버" class="album-art">
-                <div class="song-title">HEYA (해야)</div>
-                <div class="song-artist">IVE (아이브)</div>
-                <span class="song-tag">K-POP</span>
+            <!-- Custom Word Registration & Word List Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Manual Add Word Panel -->
+                <div class="cockpit-card rounded-3xl p-6 border border-slate-200 h-fit">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-plus-circle text-lg text-emerald-600"></i>
+                        <h4 class="text-base font-bold text-slate-800">단어 수동 추가</h4>
+                    </div>
+
+                    <form onsubmit="handleManualAddWord(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">영단어 (English)</label>
+                            <input type="text" id="manual-word" required placeholder="e.g. Navigation" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">한글 뜻 (Korean)</label>
+                            <input type="text" id="manual-meaning" required placeholder="예: 항해, 항법" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">발음기호</label>
+                                <input type="text" id="manual-pron" placeholder="/nævɪˈɡeɪʃn/" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">출처 단원</label>
+                                <input type="text" id="manual-unit" placeholder="1단원" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">예문 (Example Sentence)</label>
+                            <textarea id="manual-example" rows="2" placeholder="The spaceship navigation system is working." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>단어장에 등록</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 3D Flashcard & Active Word List -->
+                <div class="lg:col-span-2 flex flex-col gap-6">
+                    
+                    <!-- 3D Flashcard Viewer -->
+                    <div class="cockpit-card-dark rounded-3xl p-6 relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-cubes text-cyan-400"></i>
+                                <span class="text-sm font-bold text-white">3D 입체 플래시카드</span>
+                            </div>
+                            <span class="text-xs font-mono text-cyan-300" id="flashcard-counter">1 / 10</span>
+                        </div>
+
+                        <!-- Card Flip Area -->
+                        <div class="perspective-1000 w-full h-52 sm:h-60 my-2 cursor-pointer" onclick="flipFlashcard()">
+                            <div id="flashcard-inner" class="transform-style-3d relative w-full h-full rounded-2xl bg-slate-900 border border-cyan-500/40 p-6 flex flex-col items-center justify-center text-center shadow-2xl">
+                                <!-- Front Side -->
+                                <div class="backface-hidden absolute inset-0 p-6 flex flex-col items-center justify-center">
+                                    <span class="text-xs font-mono text-cyan-400 mb-1" id="fc-unit">🚀 콕핏 표준 단어장</span>
+                                    <h3 class="text-3xl sm:text-4xl font-extrabold text-white tracking-wide" id="fc-word">Orbit</h3>
+                                    <p class="text-xs font-mono text-slate-400 mt-2" id="fc-pron">/ˈɔːrbɪt/</p>
+                                    <span class="mt-4 text-[11px] text-cyan-300 bg-cyan-950/80 px-3 py-1 rounded-full border border-cyan-500/30">
+                                        💡 카드 터치 시 한글 뜻 뒤집기
+                                    </span>
+                                </div>
+                                <!-- Back Side -->
+                                <div class="backface-hidden rotate-y-180 absolute inset-0 p-6 flex flex-col items-center justify-center bg-slate-800 rounded-2xl border border-cyan-400">
+                                    <h4 class="text-2xl font-bold text-cyan-300 mb-2" id="fc-meaning">궤도, 궤도를 돌다</h4>
+                                    <p class="text-xs text-slate-300 italic max-w-md" id="fc-example">"The satellite is in Earth's orbit."</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Controls -->
+                        <div class="flex items-center justify-between mt-4">
+                            <button onclick="speakCurrentCardWord()" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-xl border border-slate-700 transition flex items-center gap-1.5 text-xs font-bold">
+                                <i class="fa-solid fa-volume-high"></i> 발음 들으려하기 (TTS)
+                            </button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="prevFlashcard()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold">이전</button>
+                                <button onclick="nextFlashcard()" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold">다음</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Word List Table -->
+                    <div class="cockpit-card rounded-3xl p-6 border border-slate-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <h4 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-cyan-600"></i>
+                                <span>현재 단어장 목록 (<span id="total-word-count">0</span>)</span>
+                            </h4>
+                            <input type="text" id="search-word-input" oninput="renderWordList()" placeholder="단어 검색..." class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs w-full sm:w-48">
+                        </div>
+
+                        <div class="overflow-x-auto max-h-72">
+                            <table class="w-full text-left text-xs text-slate-700">
+                                <thead class="bg-slate-100 text-slate-600 font-bold uppercase sticky top-0 border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2.5">단어 (Word)</th>
+                                        <th class="p-2.5">뜻 (Meaning)</th>
+                                        <th class="p-2.5">단원</th>
+                                        <th class="p-2.5 text-right">관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="word-table-body" class="divide-y divide-slate-100">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 02: SPEED QUIZ ARENA -->
+        <section id="tab-quiz" class="tab-content hidden flex-col gap-6">
+            
+            <!-- Quiz Mode Selector -->
+            <div class="cockpit-card rounded-3xl p-6 border border-slate-200">
+                <h3 class="text-lg font-extrabold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-crosshairs text-red-500"></i>
+                    <span>스피드 사격 훈련소 모드 선택</span>
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <button onclick="startQuizMode('eng-kor')" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-cyan-500 text-left transition bg-white flex flex-col justify-between h-32 hover:shadow-md">
+                        <div>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 font-bold">MODE 01</span>
+                            <h4 class="font-extrabold text-slate-800 text-base mt-2">영어 ➔ 한글 선택</h4>
+                        </div>
+                        <p class="text-xs text-slate-500">영단어를 보고 뜻 4지선다 타격</p>
+                    </button>
+
+                    <button onclick="startQuizMode('kor-eng')" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-cyan-500 text-left transition bg-white flex flex-col justify-between h-32 hover:shadow-md">
+                        <div>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">MODE 02</span>
+                            <h4 class="font-extrabold text-slate-800 text-base mt-2">한글 ➔ 영어 선택</h4>
+                        </div>
+                        <p class="text-xs text-slate-500">뜻을 보고 정확한 영단어 조준</p>
+                    </button>
+
+                    <button onclick="startQuizMode('voice')" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-cyan-500 text-left transition bg-white flex flex-col justify-between h-32 hover:shadow-md">
+                        <div>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-bold">MODE 03 ★</span>
+                            <h4 class="font-extrabold text-slate-800 text-base mt-2">STT 음성발화 사격</h4>
+                        </div>
+                        <p class="text-xs text-slate-500">마이크로 발음하여 타격하는 AI 모드</p>
+                    </button>
+
+                    <button onclick="startQuizMode('mixed')" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-cyan-500 text-left transition bg-white flex flex-col justify-between h-32 hover:shadow-md">
+                        <div>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">MODE 04</span>
+                            <h4 class="font-extrabold text-slate-800 text-base mt-2">랜덤 종합 사격</h4>
+                        </div>
+                        <p class="text-xs text-slate-500">모든 유형 무작위 실전 사격</p>
+                    </button>
+                </div>
             </div>
 
-            <!-- POP -->
-            <div class="song-card" data-genre="pop">
-                <img src="https://picsum.photos/300/300?random=3" alt="커버" class="album-art">
-                <div class="song-title">Espresso</div>
-                <div class="song-artist">Sabrina Carpenter</div>
-                <span class="song-tag">POP</span>
+            <!-- Active Quiz Engine Stage -->
+            <div id="quiz-stage" class="cockpit-card-dark rounded-3xl p-6 border border-cyan-500/40 relative min-h-[400px] flex flex-col justify-between">
+                
+                <!-- Quiz Header Info -->
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div class="flex items-center gap-3">
+                        <span id="quiz-mode-badge" class="px-3 py-1 bg-cyan-900 text-cyan-300 font-mono text-xs font-bold rounded-lg border border-cyan-500/30">
+                            MODE: ENG ➔ KOR
+                        </span>
+                        <span class="text-slate-400 font-mono text-xs">SCORE: <span id="quiz-score" class="text-cyan-400 font-bold text-base">0</span></span>
+                    </div>
+
+                    <div class="flex items-center gap-3 font-mono text-xs">
+                        <span class="text-amber-400 font-bold">COMBO: x<span id="quiz-combo">0</span> 🔥</span>
+                        <span class="text-slate-400">PROGRESS: <span id="quiz-progress-text">1/5</span></span>
+                    </div>
+                </div>
+
+                <!-- Main Target Display Area -->
+                <div class="py-10 text-center flex flex-col items-center justify-center">
+                    <span class="text-xs font-mono text-cyan-400 mb-2" id="quiz-target-sub">TARGET WORD</span>
+                    <h2 class="text-4xl sm:text-5xl font-black text-white tracking-wider mb-2" id="quiz-target-word">
+                        Ready to Launch
+                    </h2>
+                    <p class="text-sm font-mono text-slate-400" id="quiz-target-pron">
+                        위 모드를 선택하여 사격 훈련을 개시하십시오.
+                    </p>
+
+                    <!-- STT Voice Microphone Pulse Container (Hidden by default) -->
+                    <div id="stt-container" class="hidden my-6 flex flex-col items-center">
+                        <button onclick="toggleVoiceSTT()" id="btn-stt-mic" class="w-20 h-20 rounded-full bg-cyan-900/80 border-2 border-cyan-400 flex items-center justify-center text-3xl text-cyan-300 shadow-[0_0_30px_rgba(6,182,212,0.4)] transition hover:scale-105">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+                        <p class="text-xs font-mono text-cyan-300 mt-3" id="stt-status-text">버튼을 누르고 발음하십시오...</p>
+                        
+                        <button onclick="skipVoiceQuiz()" class="mt-4 px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl border border-slate-700">
+                            🔇 말하기 곤란해요 (건너뛰기)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Answer Choice Options Grid (4-Choices) -->
+                <div id="quiz-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                    <!-- Dynamic Answer Buttons Rendered Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 03: WARP FOCUS ROOM -->
+        <section id="tab-warp" class="tab-content hidden flex-col gap-6">
+            
+            <div class="cockpit-card rounded-3xl p-6 border border-slate-200">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-xl text-indigo-600"></i>
+                            <h3 class="text-xl font-extrabold text-slate-800">워프 몰입실 (App Blocker Simulator)</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                            목표 공부 시간과 퀴즈 점수를 달성하기 전까지 외부 방해 요소 접근을 차단합니다. 다른 탭 이동 시 알람이 울립니다.
+                        </p>
+                    </div>
+
+                    <!-- Warp Switch Button -->
+                    <button onclick="toggleWarpMode()" id="btn-toggle-warp" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl shadow-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-lock"></i>
+                        <span id="warp-btn-text">워프 몰입 모드 가동</span>
+                    </button>
+                </div>
+
+                <!-- Warp Settings & Status -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">목표 몰입 시간 (분)</label>
+                        <input type="number" id="warp-target-minutes" value="10" min="1" max="60" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm">
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">목표 퀴즈 정답 수</label>
+                        <input type="number" id="warp-target-score" value="10" min="5" max="50" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm">
+                    </div>
+                    <div class="bg-indigo-950 text-indigo-200 p-4 rounded-2xl border border-indigo-800 flex flex-col justify-center">
+                        <span class="text-[10px] font-mono text-indigo-400">몰입 경과 타이머</span>
+                        <div class="text-2xl font-mono font-extrabold text-cyan-400" id="warp-timer-display">00:00</div>
+                    </div>
+                </div>
+
+                <!-- Simulated Blocked Mobile/PC Apps Grid -->
+                <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-ban text-red-500"></i> 차단된 오락/SNS 앱 시뮬레이션
+                </h4>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    <div class="bg-slate-100 p-4 rounded-2xl border border-slate-200 text-center relative overflow-hidden group">
+                        <i class="fa-brands fa-youtube text-3xl text-red-600 mb-1"></i>
+                        <h5 class="text-xs font-bold text-slate-700">YouTube</h5>
+                        <span class="text-[10px] text-red-500 font-bold block mt-1">🔒 LOCKED</span>
+                    </div>
+
+                    <div class="bg-slate-100 p-4 rounded-2xl border border-slate-200 text-center relative overflow-hidden group">
+                        <i class="fa-brands fa-instagram text-3xl text-pink-600 mb-1"></i>
+                        <h5 class="text-xs font-bold text-slate-700">Instagram</h5>
+                        <span class="text-[10px] text-red-500 font-bold block mt-1">🔒 LOCKED</span>
+                    </div>
+
+                    <div class="bg-slate-100 p-4 rounded-2xl border border-slate-200 text-center relative overflow-hidden group">
+                        <i class="fa-solid fa-comment text-3xl text-yellow-500 mb-1"></i>
+                        <h5 class="text-xs font-bold text-slate-700">KakaoTalk</h5>
+                        <span class="text-[10px] text-red-500 font-bold block mt-1">🔒 LOCKED</span>
+                    </div>
+
+                    <div class="bg-slate-100 p-4 rounded-2xl border border-slate-200 text-center relative overflow-hidden group">
+                        <i class="fa-brands fa-tiktok text-3xl text-slate-900 mb-1"></i>
+                        <h5 class="text-xs font-bold text-slate-700">TikTok</h5>
+                        <span class="text-[10px] text-red-500 font-bold block mt-1">🔒 LOCKED</span>
+                    </div>
+
+                    <div class="bg-slate-100 p-4 rounded-2xl border border-slate-200 text-center relative overflow-hidden group">
+                        <i class="fa-solid fa-gamepad text-3xl text-purple-600 mb-1"></i>
+                        <h5 class="text-xs font-bold text-slate-700">Mobile Games</h5>
+                        <span class="text-[10px] text-red-500 font-bold block mt-1">🔒 LOCKED</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 04: LEARNING ANALYTICS REPORT -->
+        <section id="tab-analytics" class="tab-content hidden flex-col gap-6">
+            
+            <div class="cockpit-card rounded-3xl p-6 border border-slate-200">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-emerald-600"></i>
+                            <span>학습 분석 및 수행평가 데이터</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">선생님 확인용 학생 개별 단어 암기 성취도 정밀 리포트</p>
+                    </div>
+                </div>
+
+                <!-- Stats Overview Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <span class="text-xs text-slate-500 font-medium">총 학습 단어</span>
+                        <div class="text-2xl font-black text-slate-800 mt-1" id="stat-total-words">10</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <span class="text-xs text-slate-500 font-medium">퀴즈 정답률</span>
+                        <div class="text-2xl font-black text-emerald-600 mt-1" id="stat-accuracy">90%</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <span class="text-xs text-slate-500 font-medium">누적 몰입 시간</span>
+                        <div class="text-2xl font-black text-cyan-600 mt-1" id="stat-focus-time">25분</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <span class="text-xs text-slate-500 font-medium">이탈(딴짓) 감지 횟수</span>
+                        <div class="text-2xl font-black text-red-500 mt-1" id="stat-distractions">0회</div>
+                    </div>
+                </div>
+
+                <!-- Accuracy Bar visual -->
+                <div class="mb-6">
+                    <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                        <span>암기 달성 목표 진행률</span>
+                        <span id="stat-progress-percent">75%</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+                        <div id="stat-progress-bar" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-500" style="width: 75%;"></div>
+                    </div>
+                </div>
+
+                <!-- Weak Words Review List -->
+                <h4 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> 집중 복습이 필요한 취약 단어
+                </h4>
+                
+                <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200 max-h-48 overflow-y-auto">
+                    <ul id="weak-words-list" class="space-y-2 text-xs text-slate-700">
+                        <li class="flex items-center justify-between border-b border-amber-200/60 pb-1.5">
+                            <span class="font-bold">Satellite (인공위성)</span>
+                            <span class="text-red-500 font-mono">오답 2회</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 05: PILOT ACADEMY (LEADERBOARD & STORE) -->
+        <section id="tab-academy" class="tab-content hidden flex-col gap-6">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- Pilot Leaderboard -->
+                <div class="cockpit-card rounded-3xl p-6 border border-slate-200">
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-500"></i>
+                        <span>우주선 라이벌 조종사 순위</span>
+                    </h3>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-100 to-amber-50 border border-amber-200">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 text-center font-black text-amber-600">1</span>
+                                <i class="fa-solid fa-user-astronaut text-xl text-amber-600"></i>
+                                <div>
+                                    <h5 class="text-xs font-bold text-slate-800">김우주 (Pilot Alpha)</h5>
+                                    <span class="text-[10px] text-slate-500">2,450 XP | 120개 암기</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-amber-600">🏆 TOP ACE</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-100 border border-slate-200">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 text-center font-black text-slate-400">2</span>
+                                <i class="fa-solid fa-user-astronaut text-xl text-cyan-600"></i>
+                                <div>
+                                    <h5 class="text-xs font-bold text-slate-800">나별빛 (Pilot Beta)</h5>
+                                    <span class="text-[10px] text-slate-500">1,820 XP | 95개 암기</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-slate-500">2위</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-100 border border-slate-200">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 text-center font-black text-amber-700">3</span>
+                                <i class="fa-solid fa-user-astronaut text-xl text-amber-700"></i>
+                                <div>
+                                    <h5 class="text-xs font-bold text-slate-800">학생 조종사 (ME)</h5>
+                                    <span class="text-[10px] text-slate-500" id="leaderboard-my-xp">850 XP | 10개 암기</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-cyan-600">나의 순위</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Energy Crystal Store -->
+                <div class="cockpit-card rounded-3xl p-6 border border-slate-200">
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-store text-cyan-600"></i>
+                        <span>우주 에너지 💎 보상 상점</span>
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+                            <i class="fa-solid fa-rocket text-2xl text-cyan-600 mb-1"></i>
+                            <h5 class="text-xs font-bold text-slate-800">우주선 네온 스킨</h5>
+                            <button onclick="buyStoreItem('skin')" class="mt-2 w-full py-1.5 bg-cyan-600 text-white text-xs font-bold rounded-xl shadow">50 💎 구매</button>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+                            <i class="fa-solid fa-bolt text-2xl text-amber-500 mb-1"></i>
+                            <h5 class="text-xs font-bold text-slate-800">경험치 2배 부스터</h5>
+                            <button onclick="buyStoreItem('booster')" class="mt-2 w-full py-1.5 bg-cyan-600 text-white text-xs font-bold rounded-xl shadow">30 💎 구매</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- MODULE 06: SYSTEM GUIDE & TUTORIAL -->
+        <section id="tab-guide" class="tab-content hidden flex-col gap-6">
+            <div class="cockpit-card rounded-3xl p-6 border border-slate-200">
+                <h3 class="text-xl font-extrabold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-book-bookmark text-purple-600"></i>
+                    <span>틈영단 조종 매뉴얼 및 기능 명세</span>
+                </h3>
+
+                <div class="space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <h4 class="font-bold text-slate-800 text-base mb-1">1. Gemini AI 자동 단어장 구축</h4>
+                        <p>원하는 교과서 단원이나 영어 주제를 입력하면 Gemini API가 실시간으로 발음기호, 한국어 뜻, 활용 예문을 구조화하여 단어장에 자동 수집합니다.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <h4 class="font-bold text-slate-800 text-base mb-1">2. Web Speech API 기반 STT 발음 사격</h4>
+                        <p>사격 훈련소 3번 모드에서는 웹 브라우저 마이크를 통해 직접 영단어를 정확히 발음해야 정답 처리되는 음성 인식 시스템을 제공합니다.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <h4 class="font-bold text-slate-800 text-base mb-1">3. 워프 몰입실 (Page Visibility API)</h4>
+                        <p>공부 도중 유튜브나 인스타그램 등 다른 탭으로 이동 시 즉시 감지하여 사이렌 알람이 울리며 몰입 유지를 강제합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: EVALUATION REPORT MODAL (수행평가 제출용) -->
+    <div id="eval-report-modal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="max-w-2xl w-full bg-white rounded-3xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto border border-slate-300 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+                <div>
+                    <span class="px-2.5 py-0.5 bg-amber-100 text-amber-800 text-xs font-bold rounded-md">수행평가 제출용</span>
+                    <h3 class="text-xl font-extrabold text-slate-900 mt-1">기술 수행평가 개발 보고서</h3>
+                </div>
+                <button onclick="closeEvalReportModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
             </div>
 
-            <div class="song-card" data-genre="pop">
-                <img src="https://picsum.photos/300/300?random=4" alt="커버" class="album-art">
-                <div class="song-title">As It Was</div>
-                <div class="song-artist">Harry Styles</div>
-                <span class="song-tag">POP</span>
+            <div class="space-y-4 text-xs sm:text-sm text-slate-700">
+                <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 font-mono text-xs">
+                    <div><span class="text-slate-400">프로젝트명:</span> <strong>틈영단 (Teum Yeong-dan)</strong></div>
+                    <div><span class="text-slate-400">개발 학생:</span> <strong id="modal-student-name">김기술 (2학년 3반 15번)</strong></div>
+                    <div><span class="text-slate-400">적용 교과:</span> <strong>중·고등학교 기술·가정 / 정보</strong></div>
+                    <div><span class="text-slate-400">주요 대상:</span> <strong>중·고등학생 영어단어 암기</strong></div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-1">1. 개발 배경 및 목적</h4>
+                    <p class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-600 leading-relaxed">
+                        학생들이 영어 단어 암기 시 지루함을 느끼고 스마트폰/웹 딴짓(유튜브, SNS)으로 집중력이 흐려지는 문제를 해결하기 위해, 
+                        **우주선 콕핏 테마의 게이미피케이션**과 **AI 단어 생성 + 방해 차단 알람**을 결합하였습니다.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-1">2. 사용된 핵심 웹 표준 기술</h4>
+                    <ul class="list-disc list-inside bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-600 space-y-1">
+                        <li><strong>Google Gemini AI API:</strong> 교과서 단원 기반 영단어 자동 구조화 생성</li>
+                        <li><strong>Web Speech API (STT/TTS):</strong> 마이크 음성인식 사격 퀴즈 및 원어민 발음 재생</li>
+                        <li><strong>Page Visibility API:</strong> 탭 이탈 시 실시간 이탈 감지 및 비상 사이렌 경보</li>
+                        <li><strong>Web Audio API:</strong> 외부 음원 없이 순수 코드로 SF 비프음/경보음 신디사이저 구현</li>
+                    </ul>
+                </div>
             </div>
 
-            <!-- 발라드 -->
-            <div class="song-card" data-genre="ballad">
-                <img src="https://picsum.photos/300/300?random=5" alt="커버" class="album-art">
-                <div class="song-title">너의 모든 순간</div>
-                <div class="song-artist">성시경</div>
-                <span class="song-tag">발라드</span>
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeEvalReportModal()" class="px-5 py-2.5 bg-slate-800 text-white font-bold text-xs rounded-xl shadow">닫기</button>
             </div>
-
-            <div class="song-card" data-genre="ballad">
-                <img src="https://picsum.photos/300/300?random=6" alt="커버" class="album-art">
-                <div class="song-title">사건의 지평선</div>
-                <div class="song-artist">윤하 (YOUNHA)</div>
-                <span class="song-tag">발라드</span>
-            </div>
-
-            <!-- 힙합/R&B -->
-            <div class="song-card" data-genre="hiphop">
-                <img src="https://picsum.photos/300/300?random=7" alt="커버" class="album-art">
-                <div class="song-title">Smoke (Prod. Dynamicduo)</div>
-                <div class="song-artist">다이나믹 듀오, 이영지</div>
-                <span class="song-tag">힙합/R&B</span>
-            </div>
-
-            <div class="song-card" data-genre="hiphop">
-                <img src="https://picsum.photos/300/300?random=8" alt="커버" class="album-art">
-                <div class="song-title">METEOR</div>
-                <div class="song-artist">창모 (CHANGMO)</div>
-                <span class="song-tag">힙합/R&B</span>
-            </div>
-
-            <!-- 인디 -->
-            <div class="song-card" data-genre="indie">
-                <img src="https://picsum.photos/300/300?random=9" alt="커버" class="album-art">
-                <div class="song-title">주저하는 연인들을 위해</div>
-                <div class="song-artist">잔나비</div>
-                <span class="song-tag">인디</span>
-            </div>
-
-            <div class="song-card" data-genre="indie">
-                <img src="https://picsum.photos/300/300?random=10" alt="커버" class="album-art">
-                <div class="song-title">EVERYTHING</div>
-                <div class="song-artist">검정치마</div>
-                <span class="song-tag">인디</span>
-            </div>
-
         </div>
-    </container>
+    </div>
 
-    <!-- 푸터 -->
-    <footer>
-        <p>&copy; 2026 장르별 노래 추천. All rights reserved.</p>
-    </footer>
+    <!-- MODAL 2: GEMINI API KEY INPUT MODAL -->
+    <div id="api-key-modal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-3xl p-6 border border-slate-300 shadow-2xl">
+            <h3 class="text-lg font-extrabold text-slate-900 mb-2">Google Gemini API Key 설정</h3>
+            <p class="text-xs text-slate-500 mb-4">
+                발급받은 Gemini API Key를 입력하시면 교과서 맞춤 단어 자동 생성 기능을 자유롭게 사용할 수 있습니다.
+            </p>
 
-    <!-- 자바스크립트: 장르 필터링 기능 -->
+            <input type="password" id="input-gemini-key" placeholder="AIzaSy..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-mono mb-4">
+
+            <div class="flex items-center justify-end gap-2">
+                <button onclick="closeApiKeyModal()" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">취소</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-cyan-600 text-white text-xs font-bold rounded-xl shadow">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        function filterGenre(genre) {
-            // 버튼 활성화 클래스 처리
-            const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+        /* ==========================================================================
+           1. APP STATE & LOCAL STORAGE PERSISTENCE
+           ========================================================================== */
+        const DEFAULT_WORDS = [
+            { word: "orbit", meaning: "궤도, 궤도를 돌다", pron: "/ˈɔːrbɪt/", unit: "1단원 우주", example: "The satellite is in orbit." },
+            { word: "navigation", meaning: "항해, 항법", pron: "/nævɪˈɡeɪʃn/", unit: "1단원 우주", example: "Spaceship navigation is precise." },
+            { word: "atmosphere", meaning: "대기, 공기", pron: "/ˈætməsfɪər/", unit: "2단원 지구", example: "Earth has a protective atmosphere." },
+            { word: "gravity", meaning: "중력", pron: "/ˈɡrævəti/", unit: "2단원 지구", example: "Zero gravity in space." },
+            { word: "ecosystem", meaning: "생태계", pron: "/ˈiːkəʊˌsɪstəm/", unit: "3단원 환경", example: "Protect our natural ecosystem." },
+            { word: "satellite", meaning: "인공위성", pron: "/ˈsætəlaɪt/", unit: "1단원 우주", example: "Weather satellite in space." },
+            { word: "horizon", meaning: "수평선, 지평선", pron: "/həˈraɪzn/", unit: "3단원 환경", example: "The sun sank below the horizon." },
+            { word: "launch", meaning: "발사하다, 시작하다", pron: "/lɔːntʃ/", unit: "1단원 우주", example: "Launch the rocket now." }
+        ];
 
-            // 카드 필터링 처리
-            const cards = document.querySelectorAll('.song-card');
-            cards.forEach(card => {
-                if (genre === 'all' || card.getAttribute('data-genre') === genre) {
-                    card.style.display = 'flex';
+        let state = {
+            words: [],
+            pilotName: "학생 조종사",
+            level: 1,
+            xp: 850,
+            energy: 120,
+            streak: 3,
+            accuracy: 92,
+            apiKey: "",
+            currentCardIndex: 0,
+            quizScore: 0,
+            quizCombo: 0,
+            quizActiveList: [],
+            quizCurrentIndex: 0,
+            quizMode: 'eng-kor',
+            warpActive: false,
+            warpTimer: null,
+            warpSeconds: 0,
+            distractionsCount: 0
+        };
+
+        /* ==========================================================================
+           2. WEB AUDIO API SYNTHESIZER (No external mp3 assets needed)
+           ========================================================================== */
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playClickSound() {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch(e){}
+        }
+
+        function playCorrectSound() {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(now + 0.35);
+            } catch(e){}
+        }
+
+        function playWrongSound() {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.linearRampToValueAtTime(110, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(now + 0.25);
+            } catch(e){}
+        }
+
+        function playSirenSound() {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+                osc.frequency.linearRampToValueAtTime(400, now + 0.4);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(now + 0.5);
+            } catch(e){}
+        }
+
+        /* ==========================================================================
+           3. INITIALIZATION & TAB SWITCHING
+           ========================================================================== */
+        window.onload = function() {
+            loadLocalStorage();
+            renderWordList();
+            updateFlashcardUI();
+            updateHUD();
+        };
+
+        function startSpaceshipEngine() {
+            playClickSound();
+            document.getElementById('start-overlay').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('start-overlay').classList.add('hidden');
+            }, 500);
+        }
+
+        function switchTab(tabId) {
+            playClickSound();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('flex'));
+            
+            const activeTab = document.getElementById(tabId);
+            activeTab.classList.remove('hidden');
+            activeTab.classList.add('flex');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        function loadLocalStorage() {
+            const savedWords = localStorage.getItem('teum_words');
+            if (savedWords) {
+                try { state.words = JSON.parse(savedWords); } catch(e) { state.words = DEFAULT_WORDS; }
+            } else {
+                state.words = DEFAULT_WORDS;
+            }
+
+            const savedKey = localStorage.getItem('teum_gemini_key');
+            if (savedKey) state.apiKey = savedKey;
+
+            updateApiKeyStatusUI();
+        }
+
+        function saveWordsToStorage() {
+            localStorage.setItem('teum_words', JSON.stringify(state.words));
+        }
+
+        /* ==========================================================================
+           4. GEMINI AI WORD GENERATOR INTEGRATION
+           ========================================================================== */
+        async function generateAiWords() {
+            const topic = document.getElementById('ai-input-topic').value.trim();
+            const count = document.getElementById('ai-input-count').value;
+            const btn = document.getElementById('btn-generate-ai');
+
+            if (!topic) {
+                showToast("교과서 단원 또는 주제를 입력해주세요!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>AI 분석 중...</span>`;
+
+            // Prompt engineering for Gemini API structured JSON response
+            const systemPrompt = "Act as an English education AI for middle and high school students. Generate a JSON array of vocabulary objects for the specified topic.";
+            const userPrompt = `Generate exactly ${count} important English vocabulary items for the topic/unit "${topic}".
+Output ONLY valid JSON matching this structure array without extra formatting or markdown codeblocks:
+[
+  {
+    "word": "EnglishWord",
+    "pronunciation": "/pronunciation/",
+    "meaning": "한글 뜻",
+    "unit": "${topic}",
+    "example": "English example sentence using the word."
+  }
+]`;
+
+            try {
+                // Endpoint using gemini-3-flash-preview
+                const apiKey = state.apiKey || "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+                // Parse JSON array from raw response
+                const cleanedJsonText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+                const generatedWords = JSON.parse(cleanedJsonText);
+
+                if (Array.isArray(generatedWords) && generatedWords.length > 0) {
+                    const formatted = generatedWords.map(item => ({
+                        word: item.word || "word",
+                        meaning: item.meaning || "뜻",
+                        pron: item.pronunciation || "",
+                        unit: topic,
+                        example: item.example || ""
+                    }));
+
+                    state.words = [...formatted, ...state.words];
+                    saveWordsToStorage();
+                    renderWordList();
+                    updateFlashcardUI();
+                    showToast(`✨ AI가 ${formatted.length}개 단어를 자동 수집하였습니다!`);
                 } else {
-                    card.style.display = 'none';
+                    throw new Error("Invalid structure");
                 }
+            } catch (err) {
+                showToast("⚠️ AI 생성 중 오류가 발생하여 샘플 단어를 추가했습니다.");
+                // Fallback mock words
+                const mock = { word: "gravity", meaning: "중력", pron: "/ˈɡrævəti/", unit: topic, example: "Zero gravity in space." };
+                state.words.unshift(mock);
+                saveWordsToStorage();
+                renderWordList();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-microchip"></i> <span>AI 단어 생성 가동</span>`;
+            }
+        }
+
+        /* ==========================================================================
+           5. FLASHCARD & MANUAL WORD MANAGER
+           ========================================================================== */
+        function flipFlashcard() {
+            playClickSound();
+            const inner = document.getElementById('flashcard-inner');
+            inner.classList.toggle('rotate-y-180');
+        }
+
+        function updateFlashcardUI() {
+            if (state.words.length === 0) return;
+            if (state.currentCardIndex >= state.words.length) state.currentCardIndex = 0;
+
+            const cur = state.words[state.currentCardIndex];
+            document.getElementById('fc-word').innerText = cur.word;
+            document.getElementById('fc-meaning').innerText = cur.meaning;
+            document.getElementById('fc-pron').innerText = cur.pron || '';
+            document.getElementById('fc-unit').innerText = `🚀 ${cur.unit || '공통 단원'}`;
+            document.getElementById('fc-example').innerText = `"${cur.example || ''}"`;
+            document.getElementById('flashcard-counter').innerText = `${state.currentCardIndex + 1} / ${state.words.length}`;
+        }
+
+        function nextFlashcard() {
+            playClickSound();
+            state.currentCardIndex = (state.currentCardIndex + 1) % state.words.length;
+            document.getElementById('flashcard-inner').classList.remove('rotate-y-180');
+            updateFlashcardUI();
+        }
+
+        function prevFlashcard() {
+            playClickSound();
+            state.currentCardIndex = (state.currentCardIndex - 1 + state.words.length) % state.words.length;
+            document.getElementById('flashcard-inner').classList.remove('rotate-y-180');
+            updateFlashcardUI();
+        }
+
+        function speakCurrentCardWord() {
+            const cur = state.words[state.currentCardIndex];
+            if (cur && cur.word) {
+                speakTTS(cur.word);
+            }
+        }
+
+        function speakTTS(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function handleManualAddWord(e) {
+            e.preventDefault();
+            const word = document.getElementById('manual-word').value.trim();
+            const meaning = document.getElementById('manual-meaning').value.trim();
+            const pron = document.getElementById('manual-pron').value.trim();
+            const unit = document.getElementById('manual-unit').value.trim() || '사용자 등록';
+            const example = document.getElementById('manual-example').value.trim();
+
+            if (!word || !meaning) return;
+
+            state.words.unshift({ word, meaning, pron, unit, example });
+            saveWordsToStorage();
+            renderWordList();
+            updateFlashcardUI();
+            showToast("✅ 새 단어가 등록되었습니다!");
+            e.target.reset();
+        }
+
+        function renderWordList() {
+            const query = document.getElementById('search-word-input')?.value.toLowerCase() || '';
+            const tbody = document.getElementById('word-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = state.words.filter(w => w.word.toLowerCase().includes(query) || w.meaning.includes(query));
+            document.getElementById('total-word-count').innerText = filtered.length;
+
+            filtered.forEach((w, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold text-slate-900">${w.word} <span class="text-[10px] font-normal text-slate-400 block">${w.pron || ''}</span></td>
+                    <td class="p-2.5 text-slate-700">${w.meaning}</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px]">${w.unit || '기본'}</span></td>
+                    <td class="p-2.5 text-right space-x-1">
+                        <button onclick="speakTTS('${w.word}')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 rounded text-[10px]"><i class="fa-solid fa-volume-high"></i></button>
+                        <button onclick="deleteWord(${idx})" class="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-600 rounded text-[10px]"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
+        }
+
+        function deleteWord(index) {
+            state.words.splice(index, 1);
+            saveWordsToStorage();
+            renderWordList();
+            updateFlashcardUI();
+        }
+
+        /* ==========================================================================
+           6. SPEED QUIZ ARENA ENGINE
+           ========================================================================== */
+        function startQuizMode(mode) {
+            playClickSound();
+            state.quizMode = mode;
+            state.quizScore = 0;
+            state.quizCombo = 0;
+            state.quizCurrentIndex = 0;
+            state.quizActiveList = [...state.words].sort(() => Math.random() - 0.5);
+
+            document.getElementById('quiz-score').innerText = '0';
+            document.getElementById('quiz-combo').innerText = '0';
+            document.getElementById('quiz-mode-badge').innerText = `MODE: ${mode.toUpperCase()}`;
+
+            renderNextQuizQuestion();
+        }
+
+        function renderNextQuizQuestion() {
+            if (state.quizCurrentIndex >= state.quizActiveList.length) {
+                // Quiz Finish
+                playCorrectSound();
+                showToast(`🎉 훈련 완료! 최종 점수: ${state.quizScore}점!`);
+                state.energy += 20;
+                updateHUD();
+                return;
+            }
+
+            const currentItem = state.quizActiveList[state.quizCurrentIndex];
+            document.getElementById('quiz-progress-text').innerText = `${state.quizCurrentIndex + 1}/${state.quizActiveList.length}`;
+
+            const sttBox = document.getElementById('stt-container');
+            const optionsGrid = document.getElementById('quiz-options-grid');
+            sttBox.classList.add('hidden');
+            optionsGrid.classList.remove('hidden');
+
+            if (state.quizMode === 'voice') {
+                document.getElementById('quiz-target-word').innerText = currentItem.word;
+                document.getElementById('quiz-target-pron').innerText = currentItem.meaning;
+                sttBox.classList.remove('hidden');
+                optionsGrid.classList.add('hidden');
+                return;
+            }
+
+            if (state.quizMode === 'kor-eng') {
+                document.getElementById('quiz-target-word').innerText = currentItem.meaning;
+                document.getElementById('quiz-target-pron').innerText = `[한글 뜻 조준]`;
+                renderChoiceButtons(currentItem, 'word');
+            } else {
+                // eng-kor
+                document.getElementById('quiz-target-word').innerText = currentItem.word;
+                document.getElementById('quiz-target-pron').innerText = currentItem.pron || '';
+                renderChoiceButtons(currentItem, 'meaning');
+            }
+        }
+
+        function renderChoiceButtons(correctItem, key) {
+            const optionsGrid = document.getElementById('quiz-options-grid');
+            optionsGrid.innerHTML = '';
+
+            // Generate 4 options
+            const choices = [correctItem];
+            const remaining = state.words.filter(w => w.word !== correctItem.word);
+            while (choices.length < 4 && remaining.length > 0) {
+                const rand = remaining.splice(Math.floor(Math.random() * remaining.length), 1)[0];
+                choices.push(rand);
+            }
+            choices.sort(() => Math.random() - 0.5);
+
+            choices.forEach((choice, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'p-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl border border-slate-700 font-extrabold text-sm text-left transition flex items-center justify-between shadow-lg';
+                btn.innerHTML = `
+                    <span><span class="text-cyan-400 font-mono mr-2">${idx + 1}.</span> ${choice[key]}</span>
+                    <i class="fa-solid fa-crosshairs text-slate-500"></i>
+                `;
+                btn.onclick = () => handleAnswerChoice(choice.word === correctItem.word);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function handleAnswerChoice(isCorrect) {
+            if (isCorrect) {
+                playCorrectSound();
+                state.quizScore += 10 + (state.quizCombo * 2);
+                state.quizCombo++;
+                showToast("🎯 Target Hit! 정답입니다!");
+            } else {
+                playWrongSound();
+                state.quizCombo = 0;
+                showToast("💥 Missed! 오답입니다.");
+            }
+
+            document.getElementById('quiz-score').innerText = state.quizScore;
+            document.getElementById('quiz-combo').innerText = state.quizCombo;
+
+            state.quizCurrentIndex++;
+            setTimeout(renderNextQuizQuestion, 600);
+        }
+
+        /* Web Speech STT Recognition */
+        function toggleVoiceSTT() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showToast("⚠️ 이 브라우저는 음성인식을 지원하지 않습니다.");
+                return;
+            }
+
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const rec = new SpeechRec();
+            rec.lang = 'en-US';
+
+            document.getElementById('stt-status-text').innerText = "🎙️ 발음 경청 중... 말씀하세요!";
+
+            rec.onresult = function(e) {
+                const transcript = e.results[0][0].transcript.toLowerCase().trim();
+                const target = state.quizActiveList[state.quizCurrentIndex].word.toLowerCase().trim();
+                
+                document.getElementById('stt-status-text').innerText = `인식된 음성: "${transcript}"`;
+
+                if (transcript.includes(target) || target.includes(transcript)) {
+                    handleAnswerChoice(true);
+                } else {
+                    handleAnswerChoice(false);
+                }
+            };
+
+            rec.onerror = function() {
+                document.getElementById('stt-status-text').innerText = "⚠️ 음성 인식 오류 발생. 다시 시도하십시오.";
+            };
+
+            rec.start();
+        }
+
+        function skipVoiceQuiz() {
+            showToast("🔇 음성인식을 건너뜁니다.");
+            state.quizCurrentIndex++;
+            renderNextQuizQuestion();
+        }
+
+        /* ==========================================================================
+           7. WARP FOCUS & TAB SWITCH MONITORING
+           ========================================================================== */
+        function toggleWarpMode() {
+            playClickSound();
+            state.warpActive = !state.warpActive;
+
+            const btn = document.getElementById('btn-toggle-warp');
+            if (state.warpActive) {
+                btn.className = "px-5 py-3 bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm rounded-2xl shadow-lg transition flex items-center gap-2";
+                document.getElementById('warp-btn-text').innerText = "워프 몰입 해제";
+                showToast("🔒 워프 몰입 시스템 가동! 딴짓 탭 이동 시 경보가 울립니다.");
+                startWarpTimer();
+            } else {
+                btn.className = "px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl shadow-lg transition flex items-center gap-2";
+                document.getElementById('warp-btn-text').innerText = "워프 몰입 모드 가동";
+                clearInterval(state.warpTimer);
+            }
+        }
+
+        function startWarpTimer() {
+            clearInterval(state.warpTimer);
+            state.warpTimer = setInterval(() => {
+                state.warpSeconds++;
+                const mins = String(Math.floor(state.warpSeconds / 60)).padStart(2, '0');
+                const secs = String(state.warpSeconds % 60).padStart(2, '0');
+                document.getElementById('warp-timer-display').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        // Page Visibility API Listener for Anti-Distraction
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && state.warpActive) {
+                state.distractionsCount++;
+                document.getElementById('stat-distractions').innerText = `${state.distractionsCount}회`;
+                playSirenSound();
+            }
+        });
+
+        /* ==========================================================================
+           8. HELPERS & MODAL CONTROL
+           ========================================================================== */
+        function updateHUD() {
+            document.getElementById('hud-energy').innerText = state.energy;
+            document.getElementById('hud-streak').innerText = `${state.streak}일`;
+            document.getElementById('hud-accuracy').innerText = `${state.accuracy}%`;
+            document.getElementById('stat-total-words').innerText = state.words.length;
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl border border-cyan-500/40 font-bold text-xs flex items-center gap-2 animate-bounce';
+            toast.innerHTML = `<i class="fa-solid fa-bell text-cyan-400"></i> <span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function openEvalReportModal() {
+            playClickSound();
+            document.getElementById('eval-report-modal').classList.remove('hidden');
+            document.getElementById('eval-report-modal').classList.add('flex');
+        }
+
+        function closeEvalReportModal() {
+            document.getElementById('eval-report-modal').classList.add('hidden');
+            document.getElementById('eval-report-modal').classList.remove('flex');
+        }
+
+        function openApiKeyModal() {
+            playClickSound();
+            document.getElementById('api-key-modal').classList.remove('hidden');
+            document.getElementById('api-key-modal').classList.add('flex');
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('api-key-modal').classList.add('hidden');
+            document.getElementById('api-key-modal').classList.remove('flex');
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('input-gemini-key').value.trim();
+            state.apiKey = key;
+            localStorage.setItem('teum_gemini_key', key);
+            updateApiKeyStatusUI();
+            closeApiKeyModal();
+            showToast("🔑 Gemini API Key가 저장되었습니다!");
+        }
+
+        function updateApiKeyStatusUI() {
+            const statusText = document.getElementById('api-key-status-text');
+            if (state.apiKey) {
+                statusText.innerText = "Gemini Key 연결됨 (ACTIVE)";
+            } else {
+                statusText.innerText = "Gemini API Key 설정";
+            }
+        }
+
+        function buyStoreItem(item) {
+            if (state.energy >= 30) {
+                state.energy -= 30;
+                updateHUD();
+                showToast("🛍️ 아이템 구매 완료!");
+            } else {
+                showToast("⚠️ 보상 에너지가 부족합니다!");
+            }
         }
     </script>
 </body>
